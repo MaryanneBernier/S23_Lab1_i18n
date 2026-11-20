@@ -94,6 +94,13 @@
     }
     <script>
         $(document).ready(function () { $('.summernote').summernote(); });
+
+        var form = $('form');
+        var validator = form.data('validator');
+
+        if (validator) {
+            validator.settings.ignore = ':hidden:not(.summernote)';
+        }
     </script>
  }
 

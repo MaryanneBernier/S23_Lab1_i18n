@@ -83,12 +83,24 @@ namespace ZombieParty.Controllers
                 string webRootPath = _webHostEnvironment.WebRootPath; //Chemin des images de zombies
                 var files = HttpContext.Request.Form.Files; //nouvelle image récupérée
 
+                var ancienZombie = await _baseDonnees.Zombies
+    .        AsNoTracking()
+            .FirstOrDefaultAsync(z => z.Id == zombieVM.Zombie.Id);
+
+                if (ancienZombie == null)
+                {
+                    return NotFound();
+                }
+
+                zombieVM.Zombie.Image = ancienZombie.Image;
+
                 if (files.Count > 0)
                 {
                     // Nom fichier généré, unique        
                     string fileName = Guid.NewGuid().ToString();
                     // chemin pour les images du zombie
-                    var uploads = Path.Combine(webRootPath, AppConstants.ImagePathZombies);
+                    var uploads = Path.Combine(webRootPath, "images", "zombies");
+                    Directory.CreateDirectory(uploads);
                     // extraire l'extention du fichier
                     var extenstion = Path.GetExtension(files[0].FileName);
 
@@ -121,6 +133,10 @@ namespace ZombieParty.Controllers
         public IActionResult Create()
         {
             ZombieVM zombieVM = new ZombieVM();
+
+            zombieVM.Zombie = new Zombie();
+
+
             zombieVM.ZombieTypeSelectList = _baseDonnees.ZombieTypes.Select(t => new SelectListItem
             {
                 Text = t.TypeName,
